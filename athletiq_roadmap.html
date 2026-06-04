@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Athletiq — Product Roadmap</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Barlow Condensed"', 'sans-serif'],
+            body: ['Barlow', 'sans-serif'],
+          },
+          colors: {
+            night: '#0a0a0f',
+            track: '#111118',
+            rail: '#18181f',
+            line: '#22222c',
+            v1: { DEFAULT: '#e8ff47', dim: '#c8dd30', muted: '#1e2005', text: '#a8b820' },
+            v2: { DEFAULT: '#00e5c4', dim: '#00bfa3', muted: '#00231d', text: '#00c9a8' },
+            v3: { DEFAULT: '#ff5c35', dim: '#d94a29', muted: '#2a0e06', text: '#ff7a5a' },
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.5s ease forwards',
+          },
+          keyframes: {
+            fadeUp: {
+              '0%': { opacity: 0, transform: 'translateY(10px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #0a0a0f;
+      font-family: 'Barlow', sans-serif;
+      color: #e2e2e8;
+    }
+
+    /* Track lane stripe background */
+    .track-bg {
+      background-image: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 119px,
+        rgba(255,255,255,0.025) 119px,
+        rgba(255,255,255,0.025) 120px
+      );
+    }
+
+    /* Noise grain overlay */
+    .grain::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 150px;
+    }
+
+    /* Phase separator with color */
+    .phase-rule {
+      height: 3px;
+      border-radius: 2px;
+      margin-bottom: 2rem;
+    }
+
+    /* Card hover shimmer */
+    .domain-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .domain-card:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #111118; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+    /* Number badge */
+    .phase-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 5rem;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      opacity: 0.07;
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .feature-li {
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: #9494a6;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .feature-li:last-child { border-bottom: none; padding-bottom: 0; }
+    .feature-li .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    /* Chip mono */
+    .stack-chip {
+      font-family: 'Barlow Condensed', monospace;
+      font-weight: 600;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #666678;
+    }
+
+    /* Stagger animation */
+    .phase-section { animation: fadeUp 0.6s ease both; }
+    .v1-phase { animation-delay: 0.1s; }
+    .v2-phase { animation-delay: 0.2s; }
+    .v3-phase { animation-delay: 0.3s; }
+  </style>
+</head>
+
+<body class="grain min-h-screen">
+  <div class="relative z-10 track-bg">
+
+    <!-- ── HEADER ─────────────────────────────────────── -->
+    <header class="sticky top-0 z-50 border-b border-white/[0.06] bg-night/90 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-sm bg-v1 flex items-center justify-center">
+            <i class="ti ti-bolt text-night text-sm font-black"></i>
+          </div>
+          <span class="font-display font-800 text-white text-lg tracking-wide uppercase" style="font-weight:800;letter-spacing:0.08em">ATHLETIQ</span>
+          <span class="text-white/20 text-xs font-body font-medium ml-1 border border-white/10 px-2 py-0.5 rounded-sm">ROADMAP</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <a href="#v1" class="font-display font-700 text-xs uppercase tracking-widest px-3 py-1 rounded-sm border border-v1/30 text-v1/80 hover:bg-v1/10 transition-colors" style="font-weight:700">V1</a>
+          <a href="#v2" class="font-display font-700 text-xs uppercase tracking-widest px-3 py-1 rounded-sm border border-v2/30 text-v2/80 hover:bg-v2/10 transition-colors" style="font-weight:700">V2</a>
+          <a href="#v3" class="font-display font-700 text-xs uppercase tracking-widest px-3 py-1 rounded-sm border border-v3/30 text-v3/80 hover:bg-v3/10 transition-colors" style="font-weight:700">V3</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── HERO ───────────────────────────────────────── -->
+    <div class="max-w-7xl mx-auto px-6 pt-12 pb-10">
+      <div class="flex flex-wrap items-end gap-4 mb-4">
+        <h1 class="font-display text-white leading-none" style="font-weight:900;font-size:clamp(2.8rem,6vw,5rem);letter-spacing:-0.01em">PRODUCT<br><span style="color:#e8ff47">ROADMAP</span></h1>
+        <div class="pb-2">
+          <p class="text-white/40 font-body text-sm max-w-xs leading-relaxed">Athlete management platform — from core daily loop to AI-powered intelligence.</p>
+        </div>
+      </div>
+
+      <!-- Stack chips -->
+      <div class="flex flex-wrap gap-2 mt-6">
+        <span class="stack-chip">Laravel</span>
+        <span class="stack-chip">PostgreSQL</span>
+        <span class="stack-chip">Vue.js + Inertia</span>
+        <span class="stack-chip">Redis</span>
+        <span class="stack-chip">Laravel Reverb</span>
+        <span class="stack-chip">Docker</span>
+        <span class="stack-chip">Stripe</span>
+      </div>
+
+      <!-- Timeline bar -->
+      <div class="mt-8 flex gap-1 h-2 rounded-full overflow-hidden">
+        <div class="flex-[4] rounded-l-full" style="background:#e8ff47;opacity:0.85"></div>
+        <div class="flex-[4]" style="background:#00e5c4;opacity:0.85"></div>
+        <div class="flex-[6] rounded-r-full" style="background:#ff5c35;opacity:0.85"></div>
+      </div>
+      <div class="flex mt-1.5 text-[10px] font-display font-700 uppercase tracking-widest" style="font-weight:700">
+        <div class="flex-[4] text-v1/60">Months 1–4</div>
+        <div class="flex-[4] text-v2/60">Months 5–8</div>
+        <div class="flex-[6] text-v3/60">Months 9–14</div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 pb-20 space-y-20">
+
+      <!-- ════════════════════════════════════════════════
+           V1 — FOUNDATION
+      ═════════════════════════════════════════════════ -->
+      <section id="v1" class="phase-section v1-phase">
+        <!-- Phase header -->
+        <div class="relative overflow-hidden rounded-lg border border-v1/20 bg-v1/[0.04] px-6 py-5 mb-8" style="background:linear-gradient(135deg, rgba(232,255,71,0.06) 0%, transparent 60%)">
+          <span class="phase-num text-v1">01</span>
+          <div class="flex flex-wrap items-center gap-4">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                <span class="font-display text-v1 uppercase tracking-widest text-xs font-700" style="font-weight:700">Phase</span>
+                <span class="w-10 h-px bg-v1/30"></span>
+                <span class="font-display text-white/40 uppercase tracking-widest text-xs">Months 1–4</span>
+              </div>
+              <h2 class="font-display text-white leading-none" style="font-weight:900;font-size:2.5rem;letter-spacing:-0.01em">V1 — <span style="color:#e8ff47">FOUNDATION</span></h2>
+            </div>
+          </div>
+          <p class="mt-3 text-white/50 text-sm font-body max-w-2xl leading-relaxed">Build the core daily loop athletes use every day and coaches rely on for basic oversight. Ship something real athletes want to log sessions in.</p>
+        </div>
+        <div class="phase-rule" style="background: linear-gradient(90deg, #e8ff47, transparent)"></div>
+
+        <!-- Cards grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+          <!-- Identity & auth -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-user-circle text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Identity & Auth</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Email/password registration with verification</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Athlete and coach profile creation (all core fields)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Global role system: athlete, coach, staff, org admin</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Onboarding wizard: events → goals → coach → org invite</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>onboarded_at guard — redirect to wizard until complete</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Password reset via signed time-limited URLs</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Account lockout after 5 failed attempts (Redis throttle)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Laravel Sanctum SPA auth (cookie + CSRF)</li>
+            </ul>
+          </div>
+
+          <!-- Organizations & teams -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-building-community text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Organizations & Teams</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Organization creation (club / national_team types)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Invitation system: email → secure token → accept/decline</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>OrgLimitEnforcer: two-org rule (max 1 club + 1 national team)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Squad creation and athlete assignment to squads</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Coach-athlete assignment (coach_athlete_assignments)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>EnsureCoachOwnsAthlete middleware on all coach→athlete routes</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Staff role: read-only access to assigned athletes only</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Membership status lifecycle: invited → active → left / suspended</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Nightly ExpireInvitations command</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Membership data-access scoping by joined_at / left_at date range</li>
+            </ul>
+          </div>
+
+          <!-- Training session core -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-run text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Training Session Core</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Log training session: type, date, duration, RPE, location, weather, notes</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Sprint session logging: reps with distance, time, wind, reaction time, splits (JSONB)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Gym session logging: exercises, sets, weight, reps, set type, RPE</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Shared exercise library (categories, muscle groups, movement patterns)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Session status workflow: logged → reviewed → approved / flagged</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Session history with filtering by type, date, status</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Soft delete on sessions — data never permanently destroyed</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>internal_notes field — coach-only, never exposed to athlete</li>
+            </ul>
+          </div>
+
+          <!-- Unplanned detection -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-alert-triangle text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Unplanned Session Detection</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>UnplannedSessionDetector checks active plan on each log</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Sets is_unplanned = true when no plan_session_id and active plan exists</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Dual notification: in-app + email to coach</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>unplanned_notified_at prevents duplicate alerts</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Active plan cache in Redis (invalidated on plan changes)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Athletes with no active plan log freely — no flag</li>
+            </ul>
+          </div>
+
+          <!-- Performance & PRs -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-trophy text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Performance & PRs</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Competition creation by org admin / coach</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Athlete registration via coach (competition_registrations)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Athlete logs own competition result (time in s / distance in m)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>PRDetectionService: auto-detects new PB on result submission</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Event type awareness: lower = better track, higher = better field</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>ON DELETE CASCADE: result deletion removes linked PersonalRecord</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Wind reading stored — legal limit logic (≤ +2.0 m/s)</li>
+            </ul>
+          </div>
+
+          <!-- Recovery & Wellness -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-heart-rate-monitor text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Recovery & Wellness</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Daily wellness check-in: fatigue, soreness, mood, stress, motivation (1–10)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Sleep log: duration, quality, bedtime, wake time</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>One log per athlete per day enforced (unique constraint)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Basic trend charts on athlete dashboard</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Partial readiness score when only one log submitted</li>
+            </ul>
+          </div>
+
+          <!-- Training Plans (simple) -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-calendar-event text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Training Plans</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Coach creates plan as ordered session list</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Plan phases: base, build, peak, competition, recovery, transition</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Assign plan to athlete with start date</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Athlete views plan sessions on calendar</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Basic planned vs actual session comparison</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Link logged session to plan_session_id</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Plan status: active → completed / cancelled</li>
+            </ul>
+          </div>
+
+          <!-- Attendance -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-checklist text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Attendance</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Manual attendance recording by coach or admin</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Statuses: present, absent, excused, late, partial</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Per-session date attendance entry</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Bulk attendance entry (POST /attendance/bulk)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Attendance history view per squad</li>
+            </ul>
+          </div>
+
+          <!-- Session Review & Feedback -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-message-circle text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Session Review & Feedback</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Coach writes review: technique note, load note, general note</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Action items (JSONB: text, due date, completed)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Coach can update review post-submission</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Session status updated on review/approve/flag</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Athlete notified on each status change</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Session queue view for coaches (status=logged)</li>
+            </ul>
+          </div>
+
+          <!-- Analytics (basic) -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-chart-bar text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Analytics (Basic)</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Training volume chart (weekly/monthly bar)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>PR progression per event (line chart)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Session RPE trend over time</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Basic readiness score display from available data</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Athlete dashboard KPIs: sessions this week, days to competition, PR age</li>
+            </ul>
+          </div>
+
+          <!-- Notifications V1 -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-bell text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Notifications</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>In-app notification center</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Email notifications for all key events</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Types: session_reviewed, session_approved, session_flagged</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Types: pr_set, pr_deleted, unplanned_session</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Types: plan_assigned, competition_registered, invitation_received</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Mark read / mark all read endpoints</li>
+            </ul>
+          </div>
+
+          <!-- Billing -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-credit-card text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Billing</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Stripe integration for all four pricing tiers</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Subscription creation, upgrade, downgrade, cancellation</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>EnforceSubscriptionLimits middleware (athlete seat count)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Feature flag checks per plan (hasFeature())</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Stripe webhook handling: created, updated, payment_succeeded, payment_failed, deleted</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Athlete data persists after org cancellation</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Stripe customer portal route</li>
+            </ul>
+          </div>
+
+          <!-- Security & Architecture -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v1/10 border border-v1/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-shield-lock text-v1 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Security & Architecture</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>UUID PKs on all tables — no sequential ID exposure</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Laravel Policies for all resource authorization</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>ScopeToOrganization middleware on all org-scoped routes</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>CQRS-lite: Actions for writes, Query classes for complex reads</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Domain-driven folder structure (Training, Performance, Recovery, Team…)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>All slow ops on queues (email, ACWR, PDF)</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Redis caching for athlete dashboard and squad overview</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>Form Request validation on every endpoint</li>
+              <li class="feature-li"><span class="dot" style="background:#e8ff47"></span>RFC 7807 error format across all API responses</li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════
+           V2 — INTELLIGENCE
+      ═════════════════════════════════════════════════ -->
+      <section id="v2" class="phase-section v2-phase">
+        <div class="relative overflow-hidden rounded-lg border border-v2/20 px-6 py-5 mb-8" style="background:linear-gradient(135deg, rgba(0,229,196,0.06) 0%, transparent 60%)">
+          <span class="phase-num text-v2">02</span>
+          <div class="flex flex-wrap items-center gap-4">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                <span class="font-display text-v2 uppercase tracking-widest text-xs font-700" style="font-weight:700">Phase</span>
+                <span class="w-10 h-px bg-v2/30"></span>
+                <span class="font-display text-white/40 uppercase tracking-widest text-xs">Months 5–8</span>
+              </div>
+              <h2 class="font-display text-white leading-none" style="font-weight:900;font-size:2.5rem;letter-spacing:-0.01em">V2 — <span style="color:#00e5c4">INTELLIGENCE</span></h2>
+            </div>
+          </div>
+          <p class="mt-3 text-white/50 text-sm font-body max-w-2xl leading-relaxed">Add the analytical layer that helps coaches make better decisions and gives athletes scientific insight into their training. Introduce real-time collaboration.</p>
+        </div>
+        <div class="phase-rule" style="background: linear-gradient(90deg, #00e5c4, transparent)"></div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+          <!-- ACWR engine -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v2/10 border border-v2/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-activity text-v2 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Load Management (ACWR)</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>RecalculateLoadMetricsJob on every session create/update/soft-delete</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>session_load = RPE × duration_minutes (sRPE method)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>ATL: 7-day rolling average | CTL: 28-day rolling average</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>ACWR = ATL / CTL — zones: under (&lt; 0.8), optimal (0.8–1.3), caution (1.3–1.5), danger (&gt; 1.5)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Training monotony = mean / std_dev of daily loads</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Training strain = weekly load × monotony</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>FatigueAlertTriggered when ACWR &gt; 1.5 → red alert to coach</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>12-week ATL/CTL/ACWR line chart</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>ACWR gauge with zone coloring on athlete dashboard</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Historical recalculation when past session edited (full 28-day recompute)</li>
+            </ul>
+          </div>
+
+          <!-- Readiness Score -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v2/10 border border-v2/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-battery-charging text-v2 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Readiness Score (Full)</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>ReadinessScoreCalculator with 6 weighted components</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Sleep quality (25%), sleep duration normalized (15%)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Fatigue inverted (25%), soreness inverted (15%)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Mood (10%), load balance from ACWR (10%)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Score scaled to 0–100 with color labels (green/amber/orange/red)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>RecalculateReadinessScoreJob triggered after recovery + sleep log</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Coach squad readiness grid: all athletes color-coded</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Recovery check-in streak tracking</li>
+            </ul>
+          </div>
+
+          <!-- Training plans full builder -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v2/10 border border-v2/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-layout-board text-v2 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Training Plans (Full Builder)</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Week-view drag-and-drop session organizer</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Phase tagging per plan and per week block</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Plan template library: coach saves and reuses plans</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>PlanComplianceTracker: planned vs actual per athlete per week</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Compliance rate dashboard per athlete and squad</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>ComplianceRateQuery — end-of-day calculation</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>DuplicatePlanAction for cloning templates</li>
+            </ul>
+          </div>
+
+          <!-- Real-time WebSocket -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v2/10 border border-v2/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-broadcast text-v2 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Real-time (WebSocket)</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Laravel Reverb WebSocket server</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Private channels: user.{'{'}id{'}'}, coach.{'{'}id{'}'}</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Presence channels: session.{'{'}id{'}'}, squad.{'{'}id{'}'}</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Broadcast events: LoadMetricsUpdated, SessionLogged, FatigueAlertTriggered, PersonalRecordSet</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Coach sees athlete logging in real-time</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Online presence indicators on squad grid</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Dedicated broadcasts queue worker</li>
+            </ul>
+          </div>
+
+          <!-- Messaging -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v2/10 border border-v2/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-messages text-v2 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Messaging</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>In-app direct messaging (athlete ↔ coach)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Squad broadcast messaging (coach → entire squad)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Thread types: direct, group, squad_broadcast</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Message thread participants with last_read_at tracking</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>File attachments on messages (JSONB)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Pinned messages</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>SendMessageAction + BroadcastToSquadAction</li>
+            </ul>
+          </div>
+
+          <!-- Injury management -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v2/10 border border-v2/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-bandage text-v2 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Injury Management</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Injury reporting form with body region and side selection</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Types: strain, sprain, overuse, contusion, tendinopathy, stress_reaction, tear</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Severity: minor, moderate, severe</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Status: active → recovering → resolved</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Return-to-training date tracking</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Active injury indicator on coach squad grid</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>FatigueRiskAnalyzer: combined ACWR + injury risk signals</li>
+            </ul>
+          </div>
+
+          <!-- Advanced Analytics -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v2/10 border border-v2/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-chart-line text-v2 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Advanced Analytics</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Performance trend analysis per event with regression line</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Seasonal periodization overview</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Squad comparison dashboard (all athletes side-by-side)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>CSV export for all data views</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>PDF session and performance report generation</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>12-week load chart pre-calculated nightly by scheduler</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>PostgreSQL read replica for analytics queries</li>
+            </ul>
+          </div>
+
+          <!-- Security additions -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v2/10 border border-v2/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-key text-v2 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Security Additions</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>TOTP-based 2FA for coaches and admins</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>two_factor_secret encrypted at rest</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>AthletePolicy::viewForConvocation — national team cross-org read access</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>can_view_for_convocation flag: settable by org admin only</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>All convocation reads logged in audit_logs</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Race condition guard on two-org rule (DB transaction + row lock)</li>
+            </ul>
+          </div>
+
+          <!-- UX & Frontend V2 -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4 sm:col-span-2 lg:col-span-1">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v2/10 border border-v2/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-layout-dashboard text-v2 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">UX & Frontend (V2)</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Command palette (Cmd+K): log session, find athlete, compose message</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Optimistic UI for all writes — rollback on error with toast</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Inline session logging via slide-over panel (no page nav)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Readiness ring: animated color-transitioning circular progress</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>ACWR radial gauge with animated zone transition</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Recovery radar chart (5 wellness dimensions)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>AthleteLoadGrid: multi-athlete load overview table for coaches</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Attendance drag-select grid (bulk status marking)</li>
+              <li class="feature-li"><span class="dot" style="background:#00e5c4"></span>Morning digest email: SendDailyAthleteDigests (07:00 scheduler)</li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════
+           V3 — SCALE & INTELLIGENCE
+      ═════════════════════════════════════════════════ -->
+      <section id="v3" class="phase-section v3-phase">
+        <div class="relative overflow-hidden rounded-lg border border-v3/20 px-6 py-5 mb-8" style="background:linear-gradient(135deg, rgba(255,92,53,0.06) 0%, transparent 60%)">
+          <span class="phase-num text-v3">03</span>
+          <div class="flex flex-wrap items-center gap-4">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                <span class="font-display text-v3 uppercase tracking-widest text-xs font-700" style="font-weight:700">Phase</span>
+                <span class="w-10 h-px bg-v3/30"></span>
+                <span class="font-display text-white/40 uppercase tracking-widest text-xs">Months 9–14</span>
+              </div>
+              <h2 class="font-display text-white leading-none" style="font-weight:900;font-size:2.5rem;letter-spacing:-0.01em">V3 — <span style="color:#ff5c35">SCALE & INTELLIGENCE</span></h2>
+            </div>
+          </div>
+          <p class="mt-3 text-white/50 text-sm font-body max-w-2xl leading-relaxed">Differentiate with AI-powered insights, mobile-first experience, wearable data, and a public API platform. This is the moat-building phase.</p>
+        </div>
+        <div class="phase-rule" style="background: linear-gradient(90deg, #ff5c35, transparent)"></div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+          <!-- AI features -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v3/10 border border-v3/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-brain text-v3 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">AI Features</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Weekly AI performance summary per athlete (LLM from training data)</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>GenerateAIPerformanceSummary job on heavy queue</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>GenerateWeeklyInsightsJob (Monday scheduler)</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Anomaly detection for unusual load or wellness patterns</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Training recommendation engine</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Natural language session search</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>AI summaries feature-flagged to Club Pro and Enterprise plans</li>
+            </ul>
+          </div>
+
+          <!-- Wearable integration -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v3/10 border border-v3/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-watch text-v3 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Wearable Integration</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Garmin Connect API sync</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Polar Flow API sync</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Apple Watch HealthKit sync</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>HRV data import → sleep logs (hrv_ms field)</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Resting HR import → sleep logs</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>GPS session data import and route visualization</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Auto-populate session duration from wearable data</li>
+            </ul>
+          </div>
+
+          <!-- Mobile app -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v3/10 border border-v3/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-device-mobile text-v3 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Mobile App</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Native iOS and Android (React Native or Flutter)</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Full offline session logging with background sync</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Push notifications (third channel: in-app + email + push)</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Biometric authentication (Face ID / fingerprint)</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Morning readiness check-in prompt</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Wearable data sync via native device APIs</li>
+            </ul>
+          </div>
+
+          <!-- Public API platform -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v3/10 border border-v3/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-api text-v3 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Public API Platform</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Laravel Passport OAuth 2.0 for third-party apps</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Developer key management</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Webhook system for third-party integrations</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Rate limiting and per-key usage dashboards</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>API documentation portal</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Feature-flagged to Club Pro and Enterprise plans</li>
+            </ul>
+          </div>
+
+          <!-- Business intelligence -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v3/10 border border-v3/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-file-analytics text-v3 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Business Intelligence</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Club admin reports: attendance rates, retention, season summaries</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Season review PDF for federation funding submissions</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>National team selection reports</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>ProcessAttendanceReport job</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Full athlete data export</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>End-of-season report generation command</li>
+            </ul>
+          </div>
+
+          <!-- Enterprise features -->
+          <div class="domain-card rounded-lg border border-white/[0.08] bg-rail p-4">
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-sm bg-v3/10 border border-v3/20 flex items-center justify-center flex-shrink-0">
+                <i class="ti ti-building text-v3 text-sm"></i>
+              </div>
+              <span class="font-display text-white font-700 uppercase tracking-wide text-sm" style="font-weight:700">Enterprise Features</span>
+            </div>
+            <ul class="space-y-0">
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>SSO (SAML / OIDC) for national federations</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>White-label branding options</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Custom plan pricing and seat limits</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Dedicated worker node scaling</li>
+              <li class="feature-li"><span class="dot" style="background:#ff5c35"></span>Advanced audit trail reporting for compliance</li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
+    </div><!-- /main content -->
+
+    <!-- ── FOOTER ─────────────────────────────────────── -->
+    <footer class="border-t border-white/[0.06] py-6 mt-4">
+      <div class="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <div class="w-5 h-5 rounded-sm bg-v1 flex items-center justify-center">
+            <i class="ti ti-bolt text-night" style="font-size:10px"></i>
+          </div>
+          <span class="font-display text-white/30 uppercase tracking-widest text-xs font-700" style="font-weight:700">ATHLETIQ</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <span class="font-display text-white/20 text-xs uppercase tracking-widest">V1 Foundation</span>
+          <span class="w-1 h-1 rounded-full bg-white/10"></span>
+          <span class="font-display text-white/20 text-xs uppercase tracking-widest">V2 Intelligence</span>
+          <span class="w-1 h-1 rounded-full bg-white/10"></span>
+          <span class="font-display text-white/20 text-xs uppercase tracking-widest">V3 Scale</span>
+        </div>
+        <span class="font-display text-white/20 text-xs uppercase tracking-widest">14-Month Roadmap</span>
+      </div>
+    </footer>
+
+  </div><!-- /track-bg -->
+</body>
+</html>
